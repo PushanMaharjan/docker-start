@@ -1,0 +1,30 @@
+services: 
+  api: 
+    build: 
+      context: "."
+      dockerfile: api.Dockerfile
+    depends_on: 
+      - db
+    ports: 
+      - "8080:8080"
+    volumes: 
+      - ".:/app/"
+    container_name: test-api
+  db: 
+    build: 
+      context: "."
+      dockerfile: db.Dockerfile
+    environment: 
+      MYSQL_DATABASE: test_db
+      MYSQL_RANDOM_ROOT_PASSWORD: password
+      MYSQL_USER: test_user
+    ports: 
+      - "3306:3306"
+    restart: always
+    volumes: 
+      - "mysql_data:/var/lib/mysql_data"
+    container_name: test_db
+    platform: linux/x86_64
+volumes: 
+  mysql_data: ~
+version: "3.7"
