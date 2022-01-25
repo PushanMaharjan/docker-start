@@ -1,7 +1,27 @@
 services: 
-  api: 
+  db: 
+    container_name: "test_db"
+    platform: linux/x86_64
     build: 
-      context: "."
+      context: .
+      dockerfile: db.Dockerfile
+    networks:
+      - default
+    restart: always
+    ports: 
+      - "3307:3306"
+    environment: 
+      MYSQL_DATABASE: "test_db"
+      MYSQL_RANDOM_ROOT_PASSWORD: "password"
+      MYSQL_USER: "test_user"
+      MYSQL_PASSWORD: "password"
+    volumes: 
+      - mysql_data:/var/lib/mysql_data
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci','--default-authentication-plugin=mysql_native_password']
+  api: 
+    container_name: "test-api"
+    build: 
+      context: .
       dockerfile: api.Dockerfile
     depends_on: 
       - db
@@ -9,22 +29,7 @@ services:
       - "8080:8080"
     volumes: 
       - ".:/app/"
-    container_name: test-api
-  db: 
-    build: 
-      context: "."
-      dockerfile: db.Dockerfile
-    environment: 
-      MYSQL_DATABASE: test_db
-      MYSQL_RANDOM_ROOT_PASSWORD: password
-      MYSQL_USER: test_user
-    ports: 
-      - "3306:3306"
-    restart: always
-    volumes: 
-      - "mysql_data:/var/lib/mysql_data"
-    container_name: test_db
-    platform: linux/x86_64
+networks:
+  default:
 volumes: 
-  mysql_data: ~
-version: "3.7"
+  mysql_data:
